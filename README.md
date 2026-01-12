@@ -1,50 +1,48 @@
-# Problema 1 – Zoom Digital: Redimensionamento de Imagens com FPGA em Verilog
-
-<h2>Descrição do Projeto</h2>
-<p>
-Esse projeto tem o objetivo de implementar um coprocessador gráfico para realizar, em tempo real, redimensionamento de imagens gerando sobre elas efeitos de Zoom-In e Zoom-Out. Esse processo foi feito utilizando o kit de desenvolvimento DE1-SoC, que contém um coprocessador Cyclone V. O sistema aplica técnicas que buscam variar o dimensionamento de imagens em escala de cinza, com representação de pixels em 8 bits, e exibe o resultado via saída VGA. O ambiente de desenvolvimento utilizado foi o Intel Quartus Prime Lite 23.1, e a linguagem de descrição de hardware usada foi o Verilog.
+<h2 style="text-align: justify;">Descrição do Projeto</h2>
+<p style="text-align: justify;">
+  Este projeto tem como objetivo a implementação de um <strong>coprocessador gráfico de alto desempenho</strong> para realizar, em tempo real, o redimensionamento de imagens (Zoom-In e Zoom-Out). O sistema foi desenvolvido utilizando o kit <strong>DE1-SoC</strong>, que integra uma FPGA Cyclone V e um Hard Processor System (HPS) baseado em ARM Cortex-A9. O coprocessador aplica técnicas de interpolação para variar o dimensionamento de imagens em escala de cinza (8 bits por pixel), exibindo o resultado via saída VGA.
+</p>
 
 <div align="center">
-    <img src="https://www.rocketboards.org/foswiki/pub/Documentation/TerasicDE1SoCDevelopmentAndEducationBoard/igp_3e6715c483b2d44cc78aca35b032c4ef_DE1-SoC_top_s.jpg"><br>
-    <strong>Imagem do Site da Altera</strong><br><br>
+  <img src="https://www.rocketboards.org/foswiki/pub/Documentation/TerasicDE1SoCDevelopmentAndEducationBoard/igp_3e6715c483b2d44cc78aca35b032c4ef_DE1-SoC_top_s.jpg"><br>
+  <strong>Imagem do Site da Altera</strong><br><br>
+</div>
+
+<section id="evolucao_tecnica">
+  <h2 style="text-align: justify;">Desenvolvimento e Arquitetura</h2>
+  <p style="text-align: justify;">
+    O desenvolvimento foi estruturado em três etapas evolutivas, integrando progressivamente hardware e software para criar um sistema de vigilância e manipulação de imagem dinâmico:
+  </p>
+
+  <ul style="text-align: justify;">
+    <li><strong>Etapa 1 (Fundação em Hardware):</strong> Implementação do núcleo do coprocessador na FPGA em Verilog. Nesta fase, o redimensionamento era controlado manualmente por chaves e botões físicos, com a imagem original carregada na memória via módulos do IP Catalog do Intel Quartus Prime Lite 23.1.</li>
+    <br>
+    <li><strong>Etapa 2 (Integração HPS-FPGA):</strong> Automação do controle através do processador ARM (HPS). Foi desenvolvida uma <strong>API em Assembly ARM</strong> que envia instruções diretamente à FPGA via ponte <strong>Avalon</strong>. Isso permitiu que o software controlasse os parâmetros de escala através de endereços mapeados em memória.</li>
+  </ul>
+
+  <div align="center">
+    <img src="diagramas/Captura de tela 2025-11-06 192558.png"><br>
+    <strong>Diagrama do caminho de dados entre a API e o hardware.</strong><br><br>
   </div>
-    
 
+  <ul style="text-align: justify;">
+    <li><strong>Etapa 3 (Interação e Overlay):</strong> Finalização do sistema com foco em experiência do usuário. Foi implementada a interação via <strong>mouse USB</strong> e um software de controle em <strong>Linguagem C</strong>. A comunicação utiliza a ponte AXI Lightweight para enviar comandos de uma ISA customizada que coordena os módulos de ampliação e redução.</li>
+  </ul>
+</section>
 
-</p>
-<p>O coprocessador gráfico consegue fazer o redimensionamento de imagens a partir dos seguintes algoritmos:</p>
-<p>
-    a) Replicação de pixel(Zoom-In)</p>
-<p>b) Vizinho mais próximo(Zoom-In)</p>
-<p>c) Decimação(Zoom-Out)</p>
-<p>d) Média de blocos(Zoom-Out)</p>
-<p>Vale lembrar que esses algoritmos devem garantir que o redimensionamento da imagem possa ocorrer em 2x.</p>
+<section id="inovacao">
+  <h2 style="text-align: justify;">Inovação e Funcionalidades Finais</h2>
+  <p style="text-align: justify;">
+    O sistema final consolidou-se como uma plataforma de <strong>zoom dinâmico</strong> com resposta instantânea. A principal inovação deste estágio foi a introdução do <strong>Hardware Overlay</strong> para a geração do cursor e da área de seleção.
+  </p>
+  <p style="text-align: justify;">
+    Diferente de sistemas convencionais, o cursor e as bordas de seleção são injetados diretamente no pipeline de vídeo da FPGA. Isso elimina a necessidade de reescrever os dados da imagem na RAM a cada movimento do mouse, garantindo uma visualização limpa e processamento em tempo real sem interferir no desempenho de exibição. 
+  </p>
+  <p style="text-align: justify;">
+    O usuário pode selecionar regiões específicas da imagem, realizar cortes e aplicar operações de zoom de forma intuitiva, enquanto a controladora de hardware interpreta as instruções do HPS e ativa os módulos específicos de processamento de imagem em milissegundos.
+  </p>
+</section>
 
-# Sumário
-- [Descrição do Projeto](#descrição-do-projeto)  
-- [Arquitetura e Caminho de Dados](#arquitetura-e-caminho-de-dados)  
-  - [Componentes Principais](#componentes-principais)  
-- [DataPath e Fluxo de Execução](#datapath-e-fluxo-de-execução)  
-  - [Visão Geral do Fluxo](#visão-geral-do-fluxo)  
-- [Unidade de Controle](#unidade-de-controle)  
-  - [Funções Principais](#funções-principais)  
-  - [Fluxo Operacional](#fluxo-operacional)  
-  - [Exemplo de Operação](#exemplo-de-operação)  
-- [Unidade Lógica e Algorítmica (ULA)](#unidade-lógica-e-algorítmica-ula)  
-  - [Integração com os Demais Blocos](#integração-com-os-demais-blocos)  
-  - [Fluxo Operacional](#fluxo-operacional-1)  
-  - [Exemplo de Operação](#exemplo-de-operação-1)
-- [Memórias](#Memórias)
-- [Algoritmos para Redimensionamento de Imagens](#algoritmos-para-redimensionamento-de-imagens)  
-  - [Replicação de Pixel (Zoom-In)](#replicação-de-pixelzoom-in)
-  - [Vizinho mais próximo (Zoom-In)](#vizinho-mais-próximozoom-in) 
-  - [Decimação (Zoom-Out)](#decimaçãozoom-out)  
-  - [Média de Blocos (Zoom-Out)](#média-de-blocoszoom-out)  
-- [Módulo VGA](#módulo-vga)
-  - [Temporização e Sincronismo](#temporização-e-sincronismo)  
-  - [Escala, Centralização e Leitura do Framebuffer](#escala-centralização-e-leitura-do-framebuffer)
- 
-- [Resultados](#resultados)
 
 ## Arquitetura e Caminho de Dados
 
